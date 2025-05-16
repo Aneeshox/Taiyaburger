@@ -1,0 +1,57 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.patches import Patch
+
+# Initialize plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+legend_patches = []
+
+def tube(name, position, length, diameter, color):
+    radius = diameter / 2
+    z = np.linspace(position, position - length, 30)
+    theta = np.linspace(0, 2 * np.pi, 30)
+    theta_grid, z_grid = np.meshgrid(theta, z)
+    x_grid = radius * np.cos(theta_grid)
+    y_grid = radius * np.sin(theta_grid)
+    ax.plot_surface(x_grid, y_grid, z_grid, color=color, alpha=0.8)
+    legend_patches.append(Patch(facecolor=color, label=name))
+
+def transition(name, position, length, start_diameter, end_diameter, color):
+    r1 = start_diameter / 2
+    r2 = end_diameter / 2
+    z = np.linspace(position, position - length, 30)
+    r = np.linspace(r1, r2, 30)
+    theta = np.linspace(0, 2 * np.pi, 30)
+    theta_grid, z_grid = np.meshgrid(theta, z)
+    r_grid = np.tile(r[:, np.newaxis], (1, 30))
+    x_grid = r_grid * np.cos(theta_grid)
+    y_grid = r_grid * np.sin(theta_grid)
+    ax.plot_surface(x_grid, y_grid, z_grid, color=color, alpha=0.8)
+    legend_patches.append(Patch(facecolor=color, label=name))
+
+def finalize_plot():
+    ax.set_title("Ouroboros I - Simplified Body (No Nose or Fins)")
+    ax.set_xlabel("X (m)")
+    ax.set_ylabel("Y (m)")
+    ax.set_zlabel("Z (m)")
+    ax.set_xlim(-0.1, 0.1)
+    ax.set_ylim(-0.1, 0.1)
+    ax.view_init(elev=20, azim=135)
+    ax.legend(handles=legend_patches, loc='upper left', bbox_to_anchor=(1.05, 1))
+    plt.tight_layout()
+    plt.show()
+
+# Draw the rocket body from your provided .mapleaf (no nose or fins)
+tube("NoseConeTube", position=0.000, length=0.238, diameter=0.1524, color='blue')
+tube("IntermediateTube", position=-0.455, length=0.3747, diameter=0.1524, color='lightblue')
+tube("RecoveryTube", position=-0.8297, length=0.6096, diameter=0.1524, color='green')
+tube("AvionicsTube", position=-1.6773, length=0.58, diameter=0.1524, color='orange')
+tube("UpperCasing", position=-2.2573, length=0.05715, diameter=0.1524, color='red')
+transition("UpperTransition", position=-2.31445, length=0.025, start_diameter=0.1524, end_diameter=0.142875, color='gray')
+tube("PVTube", position=-2.33945, length=1.66, diameter=0.142875, color='purple')
+transition("LowerTransition", position=-3.99945, length=0.0842772, start_diameter=0.142875, end_diameter=0.168, color='gray')
+tube("FinCan", position=-4.0837, length=0.868, diameter=0.168, color='cyan')
+
+finalize_plot()
